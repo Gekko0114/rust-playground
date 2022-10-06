@@ -5,7 +5,7 @@ use crossterm::terminal::{EnterAlternateScreen, LeaveAlternateScreen};
 use crossterm::cursor::{Hide, Show};
 use crossterm::event::{self, Event, KeyCode};
 use std::{
-    time::Duration,
+    time::{Duration, Instant},
     sync::mpsc::{self},
     {io, thread},
 };
@@ -50,7 +50,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Game Loop
     let mut player = Player::new();
+    let mut instant = Instant::now();
     'gameloop: loop {
+        let delta = instant.elapsed();
+        instant = Instant::now();
         let mut curr_frame = new_frame();
 
         // Input
@@ -59,6 +62,11 @@ fn main() -> Result<(), Box<dyn Error>> {
                 match key_event.code {
                     KeyCode::Left => player.move_left(),
                     KeyCode::Right => player.move_right(),
+                    KeyCode::Char(' ') | KeyCode::Enter => {
+                        if player.shoot() {
+                            audio.play("pew");
+                        }
+                    }
                     KeyCode::Esc | KeyCode::Char('q') => {
                         audio.play("lose");
                         break 'gameloop;
@@ -67,6 +75,9 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
             }
         }
+
+        // updates
+        player.update(delta);
 
         // Draw & render
         player.draw(&mut curr_frame);
