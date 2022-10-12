@@ -1,12 +1,16 @@
-use std::io;
-use std::process;
-use std::vec::Vec;
-use std::error::Error;
+use std::process::exit;
 
-use csv;
-use rand;
-use rand::seq::SliceRandom;
+mod linear_with_sgd;
 
 fn main() {
-    println!("Hello, world!");
+    let res = linear_with_sgd::run();
+
+    exit(match res {
+        Ok(_) => 0,
+        Err(e) => {
+            println!("{}", e);
+            1
+        }
+    })
+
 }
