@@ -1,3 +1,5 @@
+use crate::sum::Sum;
+
 #[derive(Eq, PartialEq, Debug)]
 pub struct Money {
     pub amount: i32,
@@ -25,8 +27,17 @@ impl Money {
         self.currency
     }
 
-    pub fn plus(&self, object: &Money) -> Expression {
-        Expression {amount: self.amount + object.amount, currency: self.currency}
+    pub fn plus(&self, object: &Money) -> Sum {
+        Sum {
+            augend: Money {
+                amount: self.amount,
+                currency: self.currency,
+            },
+            addend: Money {
+                amount: object.amount,
+                currency: object.currency,
+            }
+        }
     }
 }
 
@@ -38,4 +49,17 @@ pub struct Expression {
 impl MoneyTrait for Expression {}
 
 pub trait MoneyTrait {
+}
+
+pub trait ReduceTrait {
+    fn reduce(&self, to: &'static str) -> Money;
+}
+
+impl ReduceTrait for Money {
+    fn reduce(&self, to: &'static str ) -> Money {
+        Money {
+            amount: self.amount,
+            currency: to            
+        }
+    }
 }
