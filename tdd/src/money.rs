@@ -11,6 +11,14 @@ impl Money {
     pub fn equals(&self, object: Money) -> bool {
         self.amount == object.amount
     }
+
+    pub fn dollar(amount: i32) -> Money {
+        Money {amount: amount}
+    }
+
+    pub fn franc(amount: i32) -> Money {
+        Money {amount: amount}
+    }
 }
 
 pub trait MoneyTrait {
