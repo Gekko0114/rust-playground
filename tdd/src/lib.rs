@@ -1,4 +1,5 @@
 pub mod money;
+pub mod bank;
 
 #[cfg(test)]
 mod tests {
@@ -21,5 +22,15 @@ pub fn test_currency() {
     use super::*;
     assert_eq!(money::Money::dollar(1).currency(), "USD");
     assert_eq!(money::Money::franc(1).currency(), "CHF");
+}
+
+#[test]
+pub fn test_simple_addition() {
+    use super::*;
+    let five = money::Money::dollar(5);
+    let sum = five.plus(&five);
+    let bank = bank::Bank{};
+    let reduced = bank.reduce(sum, "USD");
+    assert!(money::Money::dollar(10).equals(reduced));
 }
 }

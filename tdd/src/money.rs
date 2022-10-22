@@ -24,8 +24,18 @@ impl Money {
     pub fn currency(&self) -> &'static str {
         self.currency
     }
+
+    pub fn plus(&self, object: &Money) -> Expression {
+        Expression {amount: self.amount + object.amount, currency: self.currency}
+    }
 }
 
+pub struct Expression {
+    pub amount: i32,
+    pub currency: &'static str
+}
+
+impl MoneyTrait for Expression {}
+
 pub trait MoneyTrait {
-    fn new(amount: i32) -> Money;
 }
