@@ -5,9 +5,9 @@ pub struct Sum {
     pub addend: Money
 }
 impl ReduceTrait for Sum {
-    fn reduce(&self, _bank: &Bank, to: &'static str ) -> Money {
+    fn reduce(&self, bank: &Bank, to: &'static str ) -> Money {
         Money {
-            amount: &self.augend.amount + &self.addend.amount,
+            amount: &self.augend.reduce(bank, to).amount + &self.addend.reduce(bank, to).amount,
             currency: to            
         }
     }

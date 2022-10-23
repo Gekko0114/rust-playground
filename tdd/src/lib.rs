@@ -76,4 +76,15 @@ pub fn test_identity_rate() {
     let bank: bank::Bank = Default::default();
     assert_eq!(1, bank.rate("USD", "USD"));
 }
+
+#[test]
+pub fn test_mixed_addition() {
+    use super::*;
+    let five_dollar = money::Money::dollar(5);
+    let ten_franc = money::Money::franc(10);
+    let mut bank: bank::Bank = Default::default();
+    bank.add_rate("CHF", "USD", 2);
+    let result = bank.reduce(five_dollar.plus(&ten_franc), "USD");
+    assert!(money::Money::dollar(10).equals(result));
+}
 }
