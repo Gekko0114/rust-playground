@@ -1,4 +1,5 @@
 use crate::sum::Sum;
+use crate::bank::Bank;
 
 #[derive(Eq, PartialEq, Debug)]
 pub struct Money {
@@ -52,13 +53,14 @@ pub trait MoneyTrait {
 }
 
 pub trait ReduceTrait {
-    fn reduce(&self, to: &'static str) -> Money;
+    fn reduce(&self, bank: &Bank, to: &'static str) -> Money;
 }
 
 impl ReduceTrait for Money {
-    fn reduce(&self, to: &'static str ) -> Money {
+    fn reduce(&self, bank: &Bank, to: &'static str ) -> Money {
+        let rate = bank.rate(self.currency, to);
         Money {
-            amount: self.amount,
+            amount: self.amount / rate,
             currency: to            
         }
     }
