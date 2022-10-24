@@ -36,18 +36,9 @@ pub fn test_simple_addition() {
 }
 
 #[test]
-pub fn test_plus_returns_sum() {
-    use super::*;
-    let five = money::Money::dollar(5);
-    let sum = five.plus(&five);
-    assert!(five.equals(sum.augend));
-    assert!(five.equals(sum.addend));
-}
-
-#[test]
 pub fn test_reduce_sum() {
     use super::*;
-    let sum = sum::Sum {augend: money::Money::dollar(3), addend: money::Money::dollar(4)};
+    let sum = sum::Sum {augend: Box::new(money::Money::dollar(3)), addend: Box::new(money::Money::dollar(4))};
     let bank: bank::Bank = Default::default();
     let result = bank.reduce(sum, "USD");
     assert!(result.equals(money::Money::dollar(7)));

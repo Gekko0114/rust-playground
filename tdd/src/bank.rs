@@ -1,4 +1,4 @@
-use crate::money::{Money, ReduceTrait};
+use crate::money::{Money, ExpressionTrait};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -7,7 +7,7 @@ pub struct Bank {
 }
 
 impl Bank {
-    pub fn reduce<R: ReduceTrait>(&self, source: R, to: &'static str ) -> Money {
+    pub fn reduce<R: ExpressionTrait>(&self, source: R, to: &'static str ) -> Money {
         source.reduce(self, to)
     }
 

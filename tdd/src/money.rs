@@ -12,7 +12,7 @@ impl Money {
         return Money {amount: self.amount * multiplier, currency: self.currency};
     }
 
-    pub fn equals(&self, object: Money) -> bool {
+    pub fn equals(&self, object: Money) -> bool {        
         (self.amount == object.amount) && (self.currency == object.currency)
     }
 
@@ -30,14 +30,14 @@ impl Money {
 
     pub fn plus(&self, object: &Money) -> Sum {
         Sum {
-            augend: Money {
+            augend: Box::new(Money {
                 amount: self.amount,
                 currency: self.currency,
-            },
-            addend: Money {
+            }),
+            addend: Box::new(Money {
                 amount: object.amount,
                 currency: object.currency,
-            }
+            })
         }
     }
 }
@@ -47,16 +47,11 @@ pub struct Expression {
     pub currency: &'static str
 }
 
-impl MoneyTrait for Expression {}
-
-pub trait MoneyTrait {
-}
-
-pub trait ReduceTrait {
+pub trait ExpressionTrait {
     fn reduce(&self, bank: &Bank, to: &'static str) -> Money;
 }
 
-impl ReduceTrait for Money {
+impl ExpressionTrait for Money {
     fn reduce(&self, bank: &Bank, to: &'static str ) -> Money {
         let rate = bank.rate(self.currency, to);
         Money {

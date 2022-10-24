@@ -1,10 +1,10 @@
-use crate::money::{Money, ReduceTrait};
+use crate::money::{Money, ExpressionTrait};
 use crate::bank::Bank;
 pub struct Sum {
-    pub augend: Money,
-    pub addend: Money
+    pub augend: Box<dyn ExpressionTrait>,
+    pub addend: Box<dyn ExpressionTrait>
 }
-impl ReduceTrait for Sum {
+impl ExpressionTrait for Sum {
     fn reduce(&self, bank: &Bank, to: &'static str ) -> Money {
         Money {
             amount: &self.augend.reduce(bank, to).amount + &self.addend.reduce(bank, to).amount,
