@@ -28,8 +28,10 @@ pub fn test_currency() {
 #[test]
 pub fn test_simple_addition() {
     use super::*;
+    use crate::money::PlusTrait;
+
     let five = money::Money::dollar(5);
-    let sum = five.plus(&five);
+    let sum = five.plus(five.clone());
     let bank: bank::Bank = Default::default();
     let reduced = bank.reduce(sum, "USD");
     assert!(money::Money::dollar(10).equals(reduced));
@@ -71,11 +73,27 @@ pub fn test_identity_rate() {
 #[test]
 pub fn test_mixed_addition() {
     use super::*;
+    use crate::money::PlusTrait;
+    
     let five_dollar = money::Money::dollar(5);
     let ten_franc = money::Money::franc(10);
     let mut bank: bank::Bank = Default::default();
     bank.add_rate("CHF", "USD", 2);
-    let result = bank.reduce(five_dollar.plus(&ten_franc), "USD");
+    let result = bank.reduce(five_dollar.plus(ten_franc), "USD");
     assert!(money::Money::dollar(10).equals(result));
+}
+
+#[test]
+pub fn test_sum_plus_money() {
+    use super::*;
+    use crate::money::PlusTrait;
+
+    let five_dollar = money::Money::dollar(5);
+    let ten_franc = money::Money::franc(10);
+    let mut bank: bank::Bank = Default::default();
+    bank.add_rate("CHF", "USD", 2);
+    let sum = sum::Sum{augend: Box::new(five_dollar), addend: Box::new(ten_franc)}.plus(five_dollar);
+    let result = bank.reduce(sum, "USD");
+    assert!(money::Money::dollar(15).equals(result));
 }
 }

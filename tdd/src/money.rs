@@ -1,7 +1,7 @@
 use crate::sum::Sum;
 use crate::bank::Bank;
 
-#[derive(Eq, PartialEq, Debug)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy)]
 pub struct Money {
     pub amount: i32,
     pub currency: &'static str
@@ -27,19 +27,6 @@ impl Money {
     pub fn currency(&self) -> &'static str {
         self.currency
     }
-
-    pub fn plus(&self, object: &Money) -> Sum {
-        Sum {
-            augend: Box::new(Money {
-                amount: self.amount,
-                currency: self.currency,
-            }),
-            addend: Box::new(Money {
-                amount: object.amount,
-                currency: object.currency,
-            })
-        }
-    }
 }
 
 pub struct Expression {
@@ -57,6 +44,22 @@ impl ExpressionTrait for Money {
         Money {
             amount: self.amount / rate,
             currency: to            
+        }
+    }
+}
+
+pub trait PlusTrait {
+    fn plus<T: ExpressionTrait + 'static>(self, addend: T) -> Sum;
+}
+
+impl PlusTrait for Money {
+    fn plus<T: ExpressionTrait + 'static>(self, object: T) -> Sum {
+        Sum {
+            augend: Box::new(Money {
+                amount: self.amount,
+                currency: self.currency,
+            }),
+            addend: Box::new(object)
         }
     }
 }
