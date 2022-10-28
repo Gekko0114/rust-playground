@@ -1,8 +1,7 @@
-use tdd_xunit::wasrun::{WasRun, TestCase};
+use tdd_xunit::test_libs::{TestCaseTest};
 
 fn main() {
-    let mut test =  WasRun{ testcase:{ TestCase{name: "test_method"}}, ..Default::default() };
-    println!("{}", test.call_was_run());
-    test.run();
-    println!("{}", test.call_was_run());
+    let test_case_test: TestCaseTest =  Default::default();
+    test_case_test.test_running();
+    test_case_test.test_set_up();
 }
