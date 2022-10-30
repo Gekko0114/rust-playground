@@ -6,4 +6,5 @@ fn main() {
     test_case_test.test_result();
     test_case_test.test_failed_result_formatting();
     test_case_test.test_failed_result();
+    test_case_test.test_suite();
 }

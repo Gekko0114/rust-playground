@@ -36,15 +36,14 @@ impl TestResult {
 }
 
 pub trait TestCaseTrait {
-    fn run(&mut self, func_name: &str) -> TestResult;
+    fn run(&mut self, func_name: &str, result: &mut TestResult);
     fn set_up(&mut self);
     fn get_log(&self) -> String;
     fn tear_down(&mut self);
 }
 
 impl TestCaseTrait for WasRun {
-    fn run(&mut self, func_name: &str) -> TestResult {
-        let mut result: TestResult = Default::default();
+    fn run(&mut self, func_name: &str, result: &mut TestResult) {
         result.test_started();
         self.set_up();
         let f = match func_name {
@@ -60,7 +59,6 @@ impl TestCaseTrait for WasRun {
             }
         };
         self.tear_down();
-        result
       }
 
     fn set_up(&mut self) {
@@ -82,19 +80,22 @@ pub struct TestCaseTest {
 
 impl TestCaseTest {
     pub fn test_template_method(&mut self) {
-        self.test.run("test_method");
+        let mut result: TestResult = Default::default();
+        self.test.run("test_method", &mut result);
         assert!("SetUp testMethod tearDown " == self.test.get_log());
     }
 
     pub fn test_result(&mut self) {
-        let result = self.test.run("test_method");
+        let mut result: TestResult = Default::default();
+        self.test.run("test_method", &mut result);
         println!("{}", result.summary());        
         assert!("1 run, 0 failed" == result.summary());
     }
 
     pub fn test_failed_result(&mut self) {
-        let result = self.test.run("test_broken_method");
-        println!("{}", result.summary());
+        let mut result: TestResult = Default::default();
+        self.test.run("test_broken_method", &mut result);
+        println!("{}", result.summary());        
         assert!("1 run, 1 failed" == result.summary());
     }
 
@@ -104,5 +105,34 @@ impl TestCaseTest {
         result.test_failed();
         println!("{}", result.summary());        
         assert!("1 run, 1 failed" == result.summary());
+    }
+
+    pub fn test_suite(&mut self) {
+        let mut suite: TestSuite =  Default::default();
+        suite.add("test_method");
+        suite.add("test_broken_method");
+        let result = suite.run();
+        println!("{}", result.summary());
+        assert!("2 run, 1 failed" == result.summary());
+    }
+}
+
+#[derive(Default)]
+pub struct TestSuite {
+    tests: Vec<String>
+}
+
+impl TestSuite {
+    pub fn add(&mut self, test_name: &'static str) {
+        self.tests.push(String::from(test_name));
+    }
+
+    pub fn run(&mut self) -> TestResult {
+        let mut result: TestResult = Default::default();
+        let mut test_cases=  TestCaseTest{test: Box::new(WasRun{..Default::default()})};
+        for test_name in &self.tests {
+            test_cases.test.run(test_name, &mut result);
+        }
+        result
     }
 }
