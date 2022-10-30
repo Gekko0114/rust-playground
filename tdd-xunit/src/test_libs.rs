@@ -1,51 +1,83 @@
-#[derive(Default, Debug, Clone, Copy)]
-pub struct TestCase<'a> {
-    pub name: &'a str
+#[derive(Default, Debug, Clone)]
+pub struct WasRun {
+    pub log: String
 }
 
-#[derive(Default, Debug, Clone, Copy)]
-pub struct WasRun<'a> {
-    pub was_run: i32,
-    pub testcase: TestCase<'a>,
-    pub was_set_up: i32,
-    pub log: &'a str
-}
-
-impl <'a>WasRun<'a> {
-    pub fn run(&mut self) {
-      match self.testcase.name {
-        "test_method" => self.test_method(),
-        "set_up" => self.set_up(),
-        _ => return
-      };
-    }
-
+impl WasRun {
     pub fn test_method(&mut self) {
-        self.was_run = 1;
+        self.log = self.log.clone() + "testMethod ";
     }
 
-    pub fn set_up(&mut self) {
-        self.was_run = 0;
-        self.was_set_up = 1;
-        self.log = "SetUp ";
+    pub fn test_broken_method(&mut self) {
+        panic!("error");
     }
 }
 
-#[derive(Default, Debug, Clone, Copy)]
+pub struct TestResult {
+    pub run_count: i32    
+}
+
+impl TestResult {
+    pub fn test_started(&mut self) {
+        self.run_count += 1;
+    }
+
+    pub fn summary(&self) -> String {
+        self.run_count.to_string() + " run, 0 failed"
+    }
+}
+
+pub trait TestCaseTrait {
+    fn run(&mut self, func_name: &str) -> TestResult;
+    fn set_up(&mut self);
+    fn get_log(&self) -> String;
+    fn tear_down(&mut self);
+}
+
+impl TestCaseTrait for WasRun {
+    fn run(&mut self, func_name: &str) -> TestResult {
+        let mut result = TestResult{run_count: 0};
+        result.test_started();
+        self.set_up();
+        match func_name {
+            "test_method" => self.test_method(),
+            "test_broken_method" => self.test_broken_method(),
+            _ => println!("no match")
+        };
+        self.tear_down();
+        result
+      }
+
+    fn set_up(&mut self) {
+        self.log = String::from("SetUp ");
+    }
+
+    fn get_log(&self) -> String {
+        self.log.clone()
+    }
+
+    fn tear_down(&mut self) {
+        self.log = self.log.clone() + "tearDown ";
+    }
+}
+
 pub struct TestCaseTest {
+    pub test: Box<dyn TestCaseTrait + 'static>
 }
 
 impl TestCaseTest {
-    pub fn test_running(&self) {
-        let mut test =  WasRun{ testcase:{ TestCase{name: "test_method"}}, ..Default::default() };
-        test.run();
-        assert!(test.was_run == 1);
+    pub fn test_template_method(&mut self) {
+        self.test.run("test_method");
+        assert!("SetUp testMethod tearDown " == self.test.get_log());
     }
 
-    pub fn test_set_up(&self) {
-        let mut test: WasRun = WasRun{ testcase:{ TestCase{name: "set_up"}}, ..Default::default()  };
-        test.run();
-        assert!(test.was_set_up == 1);
-        assert!("SetUp " == test.log);
+    pub fn test_result(&mut self) {
+        let result = self.test.run("test_method");
+        assert!("1 run, 0 failed" == result.summary());
+    }
+
+    pub fn test_failed_result(&mut self) {
+        let result = self.test.run("test_broken_method");
+        assert!("1 run, 1 failed" == result.summary());
     }
 }
